@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+<TITLE>slide</TITLE>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script >
+</HEAD>
+
+<style>
+.slideArea {clear:both; position:relative; width:100px; height:30px; overflow:hidden;}
+.slide_ul {position:absolute; top:0; left:0; width:400px;}
+.slide_li {float:left; width:100px; background:#ddd; height:30px;}
+.btns_dot {clear:both;}
+.btns_dot .dot {width:10px; height:10px; background:#666; margin-right:5px; float:left; cursor:pointer;}
+.btns_dot .dot:hover {background:#333;}
+.btns_arrow {clear:both;}
+</style>
+
+<script>
+$(document).ready(function(){
+	slideBox(".slide");
+	slideBox(".slide2");
+
+	function slideBox(name) {
+		var $slideUl = $(name + " .slide_ul");
+		var bnLength = $(name + " .slideArea").find(".slide_li").length;
+		var bnW = $(name + " .slide_li").width();
+		var currentIndex = 0;
+		
+		$(name + " .slideArea").before('<div class="btns_dot"></div>');
+		for (var i = 0; i<bnLength; i++) {
+			$(name + " .btns_dot").append('<div class="dot" data-num="' + i + '">');
+		}
+		
+		function showImg(index) {
+			var left = -(index*bnW);
+			$slideUl.animate({"left": left, width : "easeOut"},300);
+		}	
+
+		$(name + " .prev").click(function() {
+			currentIndex--;
+			if(currentIndex<0) currentIndex= bnLength-1;
+			showImg(currentIndex);
+		});
+
+		$(name + " .next").click(function() {
+			currentIndex++;
+			if(currentIndex>=bnLength) currentIndex= 0;
+			showImg(currentIndex);
+		});
+
+		$(name + " .dot").click(function() {
+			showImg($(this).attr("data-num"));
+		});
+	}
+	
+});
+</script>
+<BODY>
+
+<div class="slide">
+	<div class="slideArea">
+		<div class="slide_ul">
+			<div class="slide_li">111</div>
+			<div class="slide_li">222</div>
+			<div class="slide_li">333</div>
+			<div class="slide_li">444</div>
+		</div>
+	</div>
+	<div class="btns_arrow">
+		<button class="prev">이전</button>
+		<button class="next">다음</button>
+	</div>
+</div>	
+
+<div class="slide2">
+	<div class="slideArea">
+		<div class="slide_ul">
+			<div class="slide_li">111</div>
+			<div class="slide_li">222</div>
+			<div class="slide_li">333</div>
+			<div class="slide_li">444</div>
+		</div>
+	</div>
+	<div class="btns_arrow">
+		<button class="prev">이전</button>
+		<button class="next">다음</button>
+	</div>
+</div>	
+
+</BODY>
+</HTML>
+
