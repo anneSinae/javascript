@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+	function init_tabs() {
+		$(".tab_content").css("display","none");
+		if (!$('ul.tabs').length) { return; }
+		$('.con_area').each(function() {
+			$(this).find('.tab_content:first').show();
+		});
+		$('ul.tabs a').click(function() {
+			if (!$(this).hasClass('current')) {
+				$(this).addClass('current').parent('li').siblings('li').find('a.current').removeClass('current');
+				$($(this).attr('href')).show("1000").siblings('div.tab_content').hide("1000");
+			}
+			this.blur();
+			return false;
+		});
+	}
+	$(document).ready(function() {
+		init_tabs();
+	});
+</script>
+
+<style type="text/css">
+body {background: rgb(101, 92, 137); margin:0; padding:0;}
+ul, li {list-style-type:none; margin:0; padding:0;}
+a {text-decoration:none;}
+
+.tab_area {width:400px; height:300px; margin:10px;}
+.tabs {overflow:hidden;}
+.tabs li {float:left; width:15%; margin-right:5px; text-align:center;}
+.tabs a {color:#333; display:block; padding:5px 0; background: #544f6b; }
+.tabs a.current {background: rgba(255, 255, 255, .5);  color:#fff;}
+.tabs a:hover {background: rgb(78, 74, 99); color:#fff;}
+.con_area {position:relative; width:500px; height:300px; padding:10px; background:#fff;}
+
+</style>
+</head>
+
+<body>
+<!-- 탭시작 -->
+<div class="tab_area">
+	<ul class="tabs">
+		<li><a href="#con01">Tab1</a></li>
+		<li><a href="#con02">Tab2 </a></li>
+        <li><a href="#con03">Tab3</a></li>
+		<li><a href="#con04">Tab4</a></li>
+		<li><a href="#con05">Tab5</a></li>
+	</ul>
+    
+	<div class="con_area">
+		<div id="con01" class="tab_content">
+			<p><strong>Content Area 01</strong></p>
+			<ul>
+				<li><a href="#" title="">링크 1</a></li>
+				<li><a href="#" title="">링크 2</a></li>
+				<li><a href="#" title="">링크 3</a></li>
+				<li><a href="#" title="">링크 4</a></li>
+			</ul>
+		</div>
+		<div id="con02" class="tab_content">
+			<p><strong>Content Area 02</strong></p>
+			<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. </p>
+		</div>
+		<div id="con03" class="tab_content">
+			<p><strong>Content Area 03</strong></p>
+			<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. </p>
+		</div>
+		<div id="con04" class="tab_content">
+			<p><strong>Content Area 04</strong></p>
+			<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. </p>
+		</div>
+		<div id="con05" class="tab_content">
+			<p><strong>Content Area 05</strong></p>
+			<p>Proin elit arcu, rutrum commodo, vehicula tempus, commodo a, risus. Curabitur nec arcu. </p>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
