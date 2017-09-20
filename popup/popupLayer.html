@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>팝업 레이어</title>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script language="JavaScript" type="text/javascript">
+function setCookie( name, value, expiredays ) { 
+    var todayDate = new Date(); 
+    todayDate.setDate( todayDate.getDate() + expiredays ); 
+    document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + todayDate.toGMTString() + ";" 
+} 
+
+function closeWin(id) { 
+	if ($(id + " input:checkbox").is(":checked")) setCookie( id, "done" , 1 ); 
+	$(id).hide();
+} 
+
+function open_popup(id) {  
+	if (document.cookie.indexOf(id + "=done") < 0 ) $(id).show();
+	else $(id).hide();
+}
+
+$(document).ready(function() {
+	open_popup("#popup");
+	open_popup("#popup2");
+});
+</script>
+
+<style type="text/css">
+#popup {position:absolute; top:20px; left:20px; padding:10px; background: #666; color:#fff; font-size:14px;}
+#popup2 {position:absolute; top:70px; left:20px; padding:10px; background: #666; color:#fff; font-size:14px;}
+</style>
+</head>
+
+<body>
+
+
+<div id="popup"> 
+  	<input type='checkbox' />
+  	하루동안 팝업창 보지않기
+  	<a href="javascript:closeWin('#popup');">close</a>
+</div>  
+
+
+<div id="popup2"> 
+  	<input type='checkbox' />
+  	하루동안 팝업창 보지않기
+  	<a href="javascript:closeWin('#popup2');">close</a>
+</div>  
+
+
+</body>
+</html>
