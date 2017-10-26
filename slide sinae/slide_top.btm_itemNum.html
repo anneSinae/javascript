@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>slide top right</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+ <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+
+function slideBtmTop(option) {
+	var countBtm = 0;
+	var countTop = 0;
+	var slideNm = option.slideNm;
+	var boxList = option.slideNm + " .slide_list";
+	var box = boxList + " .box";
+	var boxNumInit = 0;
+	var origin = "[data-name='origin']";
+	var top = 0;
+	var item = boxList + " .item";
+	var itemNum = option.itemNum;
+	var boxContent = "";
+	var boxH = option.viewAreaH;
+	
+	// initialize
+	if ($(item).length%itemNum != 0) {
+		boxNumInit = $(item).length/itemNum + 1;
+		var emptyNum = itemNum - $(item).length%itemNum;
+		for(var i=0; i < emptyNum; i++) {
+			$(boxList).append("<div class='item empty'></div>");
+		}
+	} else {
+		boxNumInit = $(item).length/itemNum;
+	}
+	for(var i = 0; i < $(item).length; i++) {
+		if ($(item).eq(i).index()%itemNum == 0) {
+			boxContent += "<div class='box'>";
+		}
+		boxContent += "<div class='" + $(item).eq(i).attr("class") + "'>" + $(item).eq(i).html() + "</div>";
+		 if ($(item).eq(i).index()%itemNum == itemNum-1) {
+			boxContent += "</div>";
+		} 
+	}
+	$(boxList).html(boxContent);
+	$(box).each(function(){
+		$(this).attr("data-name", "origin");
+	});
+	$(box).last().after("<div class='" +$(box + origin).eq(0).attr("class") + "' data-name='first-copy'>" + $(box + origin).eq(0).html() + "</div>");
+	$(box).first().before("<div class='" +$(box + origin).eq(-1).attr("class") + "' data-name='last-copy'>" + $(box + origin).eq(-1).last().html() + "</div>");
+	$(boxList).height($(document).find(box).length * boxH);
+	top = parseInt("-" + boxH);
+	$(boxList).css("top", top + "px");
+	
+	// click bottom function
+	function clickBtm() {
+		if (countTop != 0) {
+			top = $(boxList).position().top - boxH;
+		} else {
+			if (top == 0) {
+				top = parseInt("-" + boxH);
+				console.log(top + "when 0");
+			}
+			countBtm++;
+			top = top - boxH;
+		}
+		$(boxList).animate({"top" :  top + "px"}, option.speed,
+			function() {
+				if (countTop != 0) {
+					countTop--;
+					$(document).find(box).first().remove();
+					top = $(boxList).position().top + boxH;
+					$(boxList).css("top", top + "px");
+				}
+				if(countBtm > 0) {
+					$(document).find(box).last().after("<div class='" +$(box + origin).eq(countBtm).attr("class") + "' data-name='copyB'>" + $(box + origin).eq(countBtm).html() + "</div>");
+					$(boxList).height($(document).find(box).length * boxH);
+				}
+				if(countBtm > boxNumInit - 1) {
+					$(boxList).find("div[data-name^='copy']").remove();
+					$(boxList).css("top", "-" + boxH + "px");
+					countBtm = 0;
+					top = "-" + boxH;
+				}
+			}
+		);
+	}
+	
+	// click top function
+	function clickTop() {
+		if (top == parseInt("-" + boxH)) {
+			top = 0;
+		}
+		if (countBtm != 0) {
+			$(document).find(box).last().remove();
+			top = $(boxList).position().top + boxH;
+			countBtm--;
+		} else {
+			countTop++;
+		}
+		$(boxList).animate({'top' : top + "px"}, option.speed,
+			function() {
+				if(countTop > 0) {
+					$(document).find(box).first().before("<div class='" + $(box + origin).eq(("-" + countTop) -1).attr("class") + "' data-name='copyT'>" + $(box + origin).eq(("-" + countTop) -1).html() + "</div>");
+					$(boxList).height($(document).find(box).length * boxH);
+					$(boxList).css("top", "-" + boxH + "px");
+				}
+				if(countTop > boxNumInit - 1) {
+					$(boxList).find("div[data-name^='copy']").remove();
+					$(boxList).css("top", "-" + boxH + "px");
+					countTop = 0;
+				}
+			}
+		);
+	}
+	
+	// control direction
+	$(slideNm + " .arrow .btn-btm").on("click", function() {
+		clickBtm();
+	});
+	$(slideNm + " .arrow .btn-top").on("click", function() {
+		clickTop();
+	});
+	
+}
+
+
+$(document).ready(function() {
+	slideBtmTop({
+		slideNm : ".slide1",
+		auto : "no",
+		speed : 200,
+		itemNum : 5,
+		viewAreaH : 250
+	});
+});
+</script>
+
+<style type="text/css">
+div, ul, li {margin:0; padding:0;}
+li {list-style:none; background:#ddd; text-align:center;}
+.slide {}
+.slide .slide_wrap {position:relative; border:2px solid #ddd; height:250px; width:100px; background:#f8f8f8; overflow:hidden;}
+.slide .slide_list {position:absolute; top:0; left:0}
+.slide .slide_list .item {float:left; width:100px; height:50px; background:#ececec;}
+.slide .slide_list .item.box01 {background:#999;}
+.slide .slide_list .item.box02 {background:#888;}
+.slide .slide_list .item.box03 {background:#777;}
+.slide .slide_list .item.box04 {background:#666;}
+.slide .slide_list .item.box05 {background:#555;}
+.slide .slide_list .item.box06 {background:#444;}
+.slide .slide_list .item.box07 {background:#333;}
+.slide .slide_list .item.box08 {background:#222;}
+.slide .slide_list .item.box09 {background:#111;}
+.slide .slide_list .item.box10 {background:#000;}
+.slide .btns {width:10px; height:10px; background:#ddd;}
+</style>
+</head>
+
+<body>
+<div class="slide slide1">
+	<div class="slide_wrap">
+		<div class="slide_list">
+			<div class="item box01">box01</div>
+			<div class="item box02">box02</div>
+			<div class="item box03">box03</div>
+			<div class="item box04">box04</div>
+			<div class="item box05">box05</div>
+			<div class="item box06">box06</div>
+			<div class="item box07">box07</div>
+			<div class="item box08">box08</div>
+			<div class="item box09">box09</div>
+			<div class="item box10">box10</div>
+			<div class="item box06">box11</div>
+			<div class="item box07">box12</div>
+			<div class="item box08">box13</div>
+		</div>
+	</div>
+	<div class="arrow">
+		<a class="btn-top" href="#">top</a>
+		<a class="btn-btm" href="#">btm</a>
+	</div>
+
+</div>
+
+</body>
+</html>

@@ -6,15 +6,17 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
+
+function slideRightLeft(option) {
 	var countNext = 0;
 	var countPrev = 0;
-	var slideNm = ".slide1";
-	var liList = slideNm + " .slide_list";
+	var slideNm = option.slideNm;
+	var liList = option.slideNm + " .slide_list";
 	var li = liList + " > li";
 	var liNumInit = $(li).length;
 	var origin = "[data-name='origin']";
 	var left = 0;
+	
 	
 	// initialize
 	$(li).each(function(){
@@ -25,9 +27,10 @@ $(document).ready(function() {
 	$(liList).width($(document).find(li).length * $(li).width());
 	left = parseInt("-" + $(li).width());
 	$(liList).css("left", left + "px");
+
 	
-	// click next
-	$(slideNm + " .arrow .btn-next").on("click", function() {
+	// click next function
+	function clickNext() {
 		if (countPrev != 0) {
 			left = $(liList).position().left - $(li).width();
 		} else {
@@ -38,7 +41,7 @@ $(document).ready(function() {
 			left = left - $(li).width();
 		}
 		
-		$(liList).animate({'left' :  left + "px"}, 200,
+		$(liList).animate({'left' :  left + "px"}, option.speed,
 			function() {
 				if (countPrev != 0) {
 					countPrev--;
@@ -58,10 +61,11 @@ $(document).ready(function() {
 				}
 			}
 		);
-	});
+	}
 	
-	// click prev
-	$(slideNm + " .arrow .btn-prev").on("click", function() {
+	
+	// click prev function
+	function clickPrev() {
 		if (left == parseInt("-" + $(li).width())) {
 			left = 0;
 		}
@@ -72,7 +76,7 @@ $(document).ready(function() {
 		} else {
 			countPrev++;
 		}
-		$(liList).animate({'left' : left + "px"}, 200,
+		$(liList).animate({'left' : left + "px"}, option.speed,
 			function() {
 				if(countPrev > 0) {
 					$(document).find(li).first().before("<li class='" + $(li + origin).eq(("-" + countPrev) -1).attr("class") + "' data-name='copyP'>" + $(li + origin).eq(("-" + countPrev) -1).html() + "</li>");
@@ -86,8 +90,74 @@ $(document).ready(function() {
 				}
 			}
 		);
+	}
+	
+	
+	// set play auto, stop
+	var setAuto;
+	var autoDirection;
+	function autoMoveNext() {
+		setAuto = setInterval(clickNext, option.duration);
+	}
+	function autoMovePrev() {
+		setAuto = setInterval(clickPrev, option.duration);
+	}
+	function stopAutoMove() {
+		clearInterval(setAuto);
+	}
+	if (option.auto == "yes"){
+		autoMoveNext();
+		$(slideNm + " .arrow .btn-play").hide();
+		$(slideNm + " .arrow .btn-next").on("click", function() {
+			clearInterval(setAuto);
+			autoMoveNext();
+			autoDirection = "next";
+			$(slideNm + " .arrow .btn-play").hide();
+			$(slideNm + " .arrow .btn-stop").show();
+		});
+		$(slideNm + " .arrow .btn-prev").on("click", function() {
+			clearInterval(setAuto);
+			autoMovePrev();
+			autoDirection = "prev";
+			$(slideNm + " .arrow .btn-play").hide();
+			$(slideNm + " .arrow .btn-stop").show();
+		});
+		$(slideNm + " .arrow .btn-stop").on("click", function() {
+			$(slideNm + " .arrow .btn-play").show();
+			$(this).hide();
+			stopAutoMove();
+		});
+		$(slideNm + " .arrow .btn-play").on("click", function() {
+			$(slideNm + " .arrow .btn-stop").show();
+			$(this).hide();
+			if (autoDirection == "next") autoMoveNext();
+			else if (autoDirection == "prev") autoMovePrev();
+		});
+	} 	
+	if (option.auto == "no"){
+		$(slideNm + " .arrow .btn-play").hide();
+		$(slideNm + " .arrow .btn-stop").hide();
+	}
+	
+	
+	// control direction
+	$(slideNm + " .arrow .btn-next").on("click", function() {
+		clickNext();
 	});
-		
+	$(slideNm + " .arrow .btn-prev").on("click", function() {
+		clickPrev();
+	});
+	
+}
+
+
+$(document).ready(function() {
+	slideRightLeft({
+		slideNm : ".slide1",
+		auto : "no",
+		speed : 200,
+		duration : 1000
+	});
 });
 </script>
 
@@ -122,6 +192,8 @@ li {list-style:none; background:#ddd; text-align:center;}
 	<div class="arrow">
 		<a class="btn-prev" href="#">prev</a>
 		<a class="btn-next" href="#">next</a>
+		<a class="btn-stop" href="#">stop</a>
+		<a class="btn-play" href="#">play</a>
 	</div>
 
 </div>

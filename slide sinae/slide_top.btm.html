@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>slide top right</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+ <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+
+function slideBtmTop(option) {
+	var countBtm = 0;
+	var countTop = 0;
+	var slideNm = option.slideNm;
+	var liList = option.slideNm + " .slide_list";
+	var li = liList + " > li";
+	var liNumInit = $(li).length;
+	var origin = "[data-name='origin']";
+	var top = 0;
+	
+	
+	// initialize
+	$(li).each(function(){
+		$(this).attr("data-name", "origin");
+	});
+	$(li).last().after("<li class='" + $(li + origin).eq(0).attr("class") + "' data-name='first-copy'>" + $(li + origin).eq(0).html() + "</li>");
+	$(li).first().before("<li class='" + $(li + origin).eq(-1).attr("class") + "' data-name='last-copy'>" + $(li + origin).eq(-1).last().html() + "</li>");
+	$(liList).height($(document).find(li).length * $(li).height());
+	top = parseInt("-" + $(li).height());
+	$(liList).css("top", top + "px");
+
+	
+	// click bottom function
+	function clickBtm() {
+		if (countTop != 0) {
+			top = $(liList).position().top - $(li).height();
+		} else {
+			if (top == 0) {
+				top = parseInt("-" + $(li).height());
+			}
+			countBtm++;
+			top = top - $(li).height();
+		}
+		
+		$(liList).animate({"top" :  top + "px"}, option.speed,
+			function() {
+				if (countTop != 0) {
+					countTop--;
+					$(document).find(li).first().remove();
+					top = $(liList).position().top + $(li).height();
+					$(liList).css("top", top + "px");
+				}
+				if(countBtm > 0) {
+					$(document).find(li).last().after("<li class='" +$(li + origin).eq(countBtm).attr("class") + "' data-name='copyN'>" + $(li + origin).eq(countBtm).html() + "</li>");
+					$(liList).height($(document).find(li).length * $(li).height());
+				}
+				if(countBtm > liNumInit - 1) {
+					$(li + "[data-name^='copy']" ).remove();
+					$(liList).css("top", "-" + $(li).height() + "px");
+					countBtm = 0;
+					top = "-" + $(li).height();
+				}
+			}
+		);
+	}
+	
+	
+	// click top function
+	function clickTop() {
+		if (top == parseInt("-" + $(li).height())) {
+			top = 0;
+		}
+		if (countBtm != 0) {
+			$(document).find(li).last().remove();
+			top = $(liList).position().top + $(li).height();
+			countBtm--;
+		} else {
+			countTop++;
+		}
+		$(liList).animate({'top' : top + "px"}, option.speed,
+			function() {
+				if(countTop > 0) {
+					$(document).find(li).first().before("<li class='" + $(li + origin).eq(("-" + countTop) -1).attr("class") + "' data-name='copyP'>" + $(li + origin).eq(("-" + countTop) -1).html() + "</li>");
+					$(liList).height($(document).find(li).length * $(li).height());
+					$(liList).css("top", "-" + $(li).height() + "px");
+				}
+				if(countTop > liNumInit - 1) {
+					$(li + "[data-name^='copy']" ).remove();
+					$(liList).css("top", "-" + $(li).height() + "px");
+					countTop = 0;
+				}
+			}
+		);
+	}
+	
+	// control direction
+	$(slideNm + " .arrow .btn-btm").on("click", function() {
+		clickBtm();
+	});
+	$(slideNm + " .arrow .btn-top").on("click", function() {
+		clickTop();
+	});
+	
+}
+
+
+$(document).ready(function() {
+	slideBtmTop({
+		slideNm : ".slide1",
+		auto : "no",
+		speed : 200
+	});
+});
+</script>
+
+<style type="text/css">
+div, ul, li {margin:0; padding:0;}
+li {list-style:none; background:#ddd; text-align:center;}
+.slide {}
+.slide .slide_wrap {position:relative; border:2px solid #ddd; height:250px; width:100px; background:#f8f8f8; overflow:hidden;}
+.slide .slide_list {position:absolute; top:0; left:0}
+.slide .slide_list li {float:left; width:100px; height:50px;}
+.slide .slide_list li.box01 {background:#999;}
+.slide .slide_list li.box02 {background:#888;}
+.slide .slide_list li.box03 {background:#777;}
+.slide .slide_list li.box04 {background:#666;}
+.slide .slide_list li.box05 {background:#555;}
+.slide .btns {width:10px; height:10px; background:#ddd;}
+</style>
+</head>
+
+<body>
+<div class="slide slide1">
+	<div class="slide_wrap">
+		<ul class="slide_list">
+			<li class="box01">box01</li>
+			<li class="box02">box02</li>
+			<li class="box03">box03</li>
+			<li class="box04">box04</li>
+			<li class="box05">box05</li>
+		</ul>
+	</div>
+	<div class="arrow">
+		<a class="btn-top" href="#">top</a>
+		<a class="btn-btm" href="#">btm</a>
+	</div>
+
+</div>
+
+</body>
+</html>
