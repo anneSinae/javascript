@@ -7,19 +7,20 @@
  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
 
-function slideBtmTop(option) {
+/*****  슬라이드 slideBtmTop *****/
+function slideBtmTop(data) {
 	var countBtm = 0;
 	var countTop = 0;
-	var slideNm = option.slideNm;
-	var boxList = option.slideNm + " .slide_list";
+	var slideNm = data.slideNm;
+	var boxList = data.slideNm + " .slide_list";
 	var box = boxList + " .box";
 	var boxNumInit = 0;
 	var origin = "[data-name='origin']";
 	var top = 0;
 	var item = boxList + " .item";
-	var itemNum = option.itemNum;
+	var itemNum = data.itemNum;
 	var boxContent = "";
-	var boxH = option.viewAreaH;
+	var boxH = data.viewAreaH;
 	
 	// initialize
 	if ($(item).length%itemNum != 0) {
@@ -62,7 +63,7 @@ function slideBtmTop(option) {
 			countBtm++;
 			top = top - boxH;
 		}
-		$(boxList).animate({"top" :  top + "px"}, option.speed,
+		$(boxList).animate({"top" :  top + "px"}, data.speed,
 			function() {
 				if (countTop != 0) {
 					countTop--;
@@ -96,7 +97,7 @@ function slideBtmTop(option) {
 		} else {
 			countTop++;
 		}
-		$(boxList).animate({'top' : top + "px"}, option.speed,
+		$(boxList).animate({'top' : top + "px"}, data.speed,
 			function() {
 				if(countTop > 0) {
 					$(document).find(box).first().before("<div class='" + $(box + origin).eq(("-" + countTop) -1).attr("class") + "' data-name='copyT'>" + $(box + origin).eq(("-" + countTop) -1).html() + "</div>");
@@ -119,7 +120,35 @@ function slideBtmTop(option) {
 	$(slideNm + " .arrow .btn-top").on("click", function() {
 		clickTop();
 	});
-	
+}
+
+
+/*****   체크항목 control *****/
+function arraySaveCheck(data) {
+	var itemArea = data.itemArea;
+	var checkItem = data.checkItem;
+	var submitBtn = data.submitBtn;
+	var arrChk = [];
+
+	// arrChk 배열에 체크표시할 index 확인/표시
+	if(arrChk.length != 0) {
+		$(itemArea + " .box[data-name='origin'] " + checkItem).each(function(index) {
+			for(var i = 0; i < arrChk.length; i++) {
+				if(index == arrChk[i]) $(this).find("input").attr("checked", true);
+			}
+		});
+	} 
+	// 클릭시 체크항목 배열에 저장
+	$(document).on("click", submitBtn, function() {
+		arrChk.length = 0;
+		$(itemArea + " .box[data-name='origin'] " + checkItem).each(function(index) {
+			if($(this).find("input:checked").length == 1) {
+				arrChk.push(index);
+			}
+		})
+		arrChk = $.unique(arrChk);
+		console.log(arrChk.join("-"));
+	}) 
 }
 
 
@@ -130,6 +159,12 @@ $(document).ready(function() {
 		speed : 200,
 		itemNum : 5,
 		viewAreaH : 250
+	});
+	
+	arraySaveCheck({
+		itemArea : ".slide1", 
+		checkItem : ".item",
+		submitBtn : ".btn-save"
 	});
 });
 </script>
@@ -159,26 +194,27 @@ li {list-style:none; background:#ddd; text-align:center;}
 <div class="slide slide1">
 	<div class="slide_wrap">
 		<div class="slide_list">
-			<div class="item box01">box01</div>
-			<div class="item box02">box02</div>
-			<div class="item box03">box03</div>
-			<div class="item box04">box04</div>
-			<div class="item box05">box05</div>
-			<div class="item box06">box06</div>
-			<div class="item box07">box07</div>
-			<div class="item box08">box08</div>
-			<div class="item box09">box09</div>
-			<div class="item box10">box10</div>
-			<div class="item box06">box11</div>
-			<div class="item box07">box12</div>
-			<div class="item box08">box13</div>
+			<div class="item box01">box01<input class="dche" type="checkbox"></div>
+			<div class="item box02">box02<input class="dche2"  type="checkbox"></div>
+			<div class="item box03">box03<input type="checkbox"></div>
+			<div class="item box04">box04<input type="checkbox"></div>
+			<div class="item box05">box05<input type="checkbox"></div>
+			<div class="item box06">box06<input type="checkbox"></div>
+			<div class="item box07">box07<input type="checkbox"></div>
+			<div class="item box08">box08<input type="checkbox"></div>
+			<div class="item box09">box09<input type="checkbox"></div>
+			<div class="item box10">box10<input type="checkbox"></div>
+			<div class="item box06">box11<input type="checkbox"></div>
+			<div class="item box07">box12<input type="checkbox"></div>
+			<div class="item box08">box13<input type="checkbox"></div>
 		</div>
 	</div>
 	<div class="arrow">
 		<a class="btn-top" href="#">top</a>
 		<a class="btn-btm" href="#">btm</a>
+		<a class="btn-save" href="#">save</a>
 	</div>
-
+	
 </div>
 
 </body>
