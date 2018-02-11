@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>dynamic form datepicker</title>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+ <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+	insertForm();
+
+	$( ".btn_codeAll" ).on("click", function(event) {
+		var getCodeAllData = getCodeAll();
+		console.log(getCodeAllData);
+	});
+});
+
+function insertForm() {
+   var $codeWrap = $(".box table tbody");
+   var copyCode = $codeWrap.html();
+   var copyNode = $codeWrap.children().get(0).nodeName;
+   getDatepicker();
+   checkBtnDeleteNum();
+	$(".btn_insert").on("click", function(event) {
+		   $codeWrap.append(copyCode);
+		   getDatepicker();
+		   checkBtnDeleteNum();
+	});
+	$(document).on("click", ".btn_delete", function(event) {
+		$(this).parents(copyNode).remove();
+		checkBtnDeleteNum();
+		event.stopPropagation(); return false;
+	})
+	function checkBtnDeleteNum() {
+		if($codeWrap.find(copyNode).length === 1) $(".btn_delete").hide();
+		else $(".btn_delete").show();
+	}
+}
+
+function getDatepicker() {
+	$( ".datepicker" ).datepicker();
+	$( document ).on("change", ".datepicker",  function() {
+		$(this).val($(this).val().split("/").join("."));
+	});
+}
+
+function getCodeAll() {
+	var inputDataArr = [];
+		$(".box table tbody").children().find("input").each(function() {
+			inputDataArr.push($(this).val());
+		})
+		return inputDataArr;
+}
+</script>
+
+<style type="text/css">
+body, div, input, a {margin:0; padding:0; line-height:100%; text-decoration:none; color:#333;}
+.box {width:500px; margin:auto;}
+.box table {width:100%; border-collapse: collapse;}
+.box td {border:1px solid #ececec; padding:10px; text-align:center;}
+.box td input {height:25px; padding:0 3px; background:#f4f4f4; border:1px solid #eaeaea;}
+.box button {height:22px; margin-top:10px;}
+</style>
+</head>
+
+<body>
+<div class="box">
+	<table>
+		<colgroup>
+			<col width="70%" />
+			<col width="*" />
+		</colgroup>
+		<tr>
+			<td><input type="text" class="datepicker"></td>
+			<td><a href="" class="btn_delete">x</a></td>
+		</tr>
+	</table>
+	<button class="btn_insert">insert</button>
+	<button class="btn_codeAll">all Code</button>
+</div>
+
+
+</body>
+</html>
