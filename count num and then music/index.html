@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>music</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	count();
+	reset(); 
+});
+function count() {
+	var originNum = 2;
+	var num = originNum;
+	(function timeCheck() {
+		$(".num").animate({}, 0, function(){
+			num !== 0 ? $(this).text(num) : $(this).addClass("txt").text("Enjoy Music!");
+			if(num > 0) {
+				num--;
+				setTimeout(function(){
+					timeCheck();
+				}, 1000);
+			} else {
+				play();
+				$(".btn_reset").addClass("active");
+				num = originNum;
+			}
+		})
+	})();
+}
+function reset() {
+	$(".btn_reset").on("click", function(){
+		if($(this).hasClass("active")) {
+			stop();
+			count();
+			$(this).removeClass("active");
+		}
+	});
+}
+function play() {
+	$(".music").trigger('play');
+}
+function stop() {
+	$(".music").trigger('pause').prop('currentTime', 0);
+}
+</script>
+
+
+<style type="text/css">
+.musicBox {width:200px; margin:auto;}
+.musicBox .num {width:200px; height:200px; text-align:center; font-size:70px; color:#555; line-height:195px;}
+.musicBox .num.txt {outline:1px solid #f5f5f5; font-size:18px; line-height:200px; text-decoration:underline;}
+.musicBox .btn_reset {display:block; width:100%; height:26px; margin:4px auto 0 auto; border:1px solid #ddd; background:none; border-radius:3px; font-size:15px; color:#bbb;} 
+.musicBox .btn_reset.active {border:1px solid #666; color:#333;}
+.musicBox .music {display:none; width:200px;}
+</style>
+</head>
+
+
+<body>
+<div class="musicBox">
+	<div class="num"></div>
+	<button class="btn_reset">stop + count start</button>
+	<audio class="music" controls preload="none">
+		<source src="song.mp3" type="audio/mpeg">
+	</audio>
+</div>
+
+
+</body>
+</html>
