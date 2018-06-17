@@ -1,0 +1,296 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>study</title>
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script> -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+   fixTableScrollBoth(".table_wrap");
+});
+
+function fixTableScrollBoth(tableWrap) {
+  $(tableWrap).each(function(){
+    var thisTableWrap = this;
+    if($(thisTableWrap).hasClass("scrollBoth")) {
+      var thNum = $(thisTableWrap).find("thead th").length;
+      var arrTdW = [];
+      var $fixAlways, $theadBox, arrThTxt = [], arrTdKeyTxt = [], $tbodyBox;
+      var tableW = $(thisTableWrap).find("table").outerWidth(),
+          tableBorderW = parseInt($(thisTableWrap).find("table").css("border-left-width"));
+
+      // saperate thead area : thead영역 분리
+      $theadBox = $(thisTableWrap).prepend("<ul class='theadBox'>").find(".theadBox");
+      $(thisTableWrap).find("tbody tr:first-child").find("td").each(function(index) {
+        arrTdW.push($(this).outerWidth());
+        arrThTxt.push($(thisTableWrap).find("thead th").eq(index).text());
+        $(this).outerWidth(arrTdW[index]);
+        $theadBox.append("<li>" + arrThTxt[index] + "</li>").find("li").eq(index).outerWidth(arrTdW[index]);
+        $theadBox.css({"width": tableW + tableBorderW}).height($theadBox.find("li").outerHeight());
+      })
+      $(thisTableWrap).find("thead").remove();
+
+      //saperate fixAlways area : fixAlways영역 구분
+      $fixAlways = $theadBox.find("li:first-child").addClass("fixAlways");
+      $fixAlways.next().css("margin-left", $fixAlways.outerWidth());
+      //$theadBox.find("li:last-child").css("box-sizing", "none");
+
+      //saperate tbody keydata area : tbody keydata영역 구분
+      $tbodyBox = $theadBox.after("<ul class='tbodyBox'>").end().find(".tbodyBox");
+      $tbodyBox.css("top", $theadBox.outerHeight());
+      $(thisTableWrap).find("tbody tr").each(function(index) {
+        var $tdKey = $(this).find("td:first-child");
+        arrTdKeyTxt.push($tdKey.text());
+        $tbodyBox.append("<li>").find("li").eq(index).text(arrTdKeyTxt[index]).outerWidth(arrTdW[0]);
+        $tdKey.remove();
+        $(this).parents("table").css({"margin-left":arrTdW[0], "margin-top":$theadBox.outerHeight(), "width":tableW - arrTdW[0] -tableBorderW});
+      });
+
+      // tbody tr hover : tbody tr 오버효과
+      $(thisTableWrap).find("tbody tr").on({
+        "mouseover": function() {$tbodyBox.find("li").removeClass("on").eq($(this).index()).addClass("on");},
+        "mouseout" : function() {$tbodyBox.find("li").removeClass("on");}
+      });
+    }
+
+    //fixed thead영역
+    $(thisTableWrap).on("scroll", function() {
+      if($(this).scrollTop() !== 0) $theadBox.animate({"top": $(this).scrollTop()}, 0, "swing");
+      else $theadBox.animate({"top": 0}, 0, "swing");
+      if($(this).scrollLeft() !== 0) {
+        $tbodyBox.animate({"left": $(this).scrollLeft()}, 0, "swing");
+        $fixAlways.animate({"left": $(this).scrollLeft()}, 0, "swing");
+      } else {
+        $tbodyBox.animate({"left": 0}, 0, "swing");
+        $fixAlways.animate({"left": 0}, 0, "swing");
+      }
+    })
+
+  })
+
+}
+</script>
+
+<style type="text/css">
+body, div, ul, li {margin:0; padding:0; list-style:none;}
+body {padding:20px;}
+
+.table_wrap {position:relative; clear:both;}
+.table_wrap:after {content:' '; display:block; clear:both;}
+
+.table_wrap.scrollBoth {width:800px; height:410px; overflow-y:scroll;}
+.table_wrap.scrollBoth table {border-top:0; *display:inline;}
+.table_wrap.scrollBoth .fixAlways {position:absolute; top:0; left:0; border-left:1px solid #d4d7dc;}
+.table_wrap.scrollBoth .theadBox {position:absolute; margin:0; border-top:2px solid #315285; z-index:100;}
+.table_wrap.scrollBoth .theadBox li {float:left; padding:10px; border-right:1px solid #d4d7dc; border-bottom:1px solid #d4d7dc; background:#f0f1f3; text-align:center; font-family:"malgun gothic"; font-size:13px; font-weight:normal; color:#293f56;}
+.table_wrap.scrollBoth .tbodyBox {position:absolute; left:0; border-left:1px solid #d4d7dc; z-index:99;}
+.table_wrap.scrollBoth .tbodyBox li {padding:10px; border:1px solid #d4d7dc; border-top:0; border-left:0; background:#fff; text-align:center; font-family:"malgun gothic"; font-size:13px; line-height:160%;}
+.table_wrap.scrollBoth .tbodyBox li.on {background:#f7f7f9;}
+
+table.basic {width:1300px; border-top:2px solid #315285; border-spacing:0px; border-collapse:collapse; border-left:1px solid #d4d7dc;}
+table.basic tr th {padding:10px; border-right:1px solid #d4d7dc; border-bottom:1px solid #d4d7dc; background:#f0f1f3; text-align:center; font-family:"malgun gothic"; font-size:13px; font-weight:normal; color:#293f56;}
+table.basic tr td {padding:10px; border:1px solid #d4d7dc; border-top:0; border-left:0; text-align:center; font-family:"malgun gothic"; font-size:13px; line-height:160%;}
+table.basic tr:hover {background:#f7f7f9;}
+</style>
+</head>
+
+<body>
+<div class="table_wrap scrollBoth">
+  <table class="basic" cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>제목</th>
+        <th>내용</th>
+        <th>작성자</th>
+        <th>부서</th>
+        <th>날짜</th>
+        <th>비고</th>
+        <th>조회</th>
+        <th>제목</th>
+        <th>내용</th>
+        <th>작성자</th>
+        <th>부서</th>
+        <th>날짜</th>
+        <th>비고</th>
+        <th>조회</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>10</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+        <td>제목임다</td>
+        <td>내용임다</td>
+        <td>홍길동</td>
+        <td>유신애부서</td>
+        <td>2018-06-20</td>
+        <td>추가내용</td>
+        <td>100</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
