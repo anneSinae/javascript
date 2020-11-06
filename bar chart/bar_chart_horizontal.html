@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<title>그래프</title>
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+
+<script>
+$(document).ready(function() {
+	
+	graph_stick({
+		arrBarVal : [[120, 0], [100, 220], [200, 40], [230, 140], [50, 20]], // [120, -50, 200, 230, 140],  
+		levelNumUpper : 6,
+		levelNumLower : 1,
+		barNumInArea : 2,
+		levelVal : 60
+	});
+});
+
+function graph_stick(data) {
+	var arrBarVal = data.arrBarVal;
+	var barAreaNum = arrBarVal.length;
+	var barNumInArea = data.barNumInArea;
+	var levelNumUpper = data.levelNumUpper;
+	var levelNumLower = data.levelNumLower;
+	var levelLength = levelNumUpper + levelNumLower;
+	var levelVal = data.levelVal;
+	var unitGraphValW = (100/(levelVal*levelLength))*($(".graph").width()/100);
+	var levelW = $(".graph").width()/levelLength;
+	///// 레벨수치영역 세팅 
+	$(".graphBox .level").append("<div class='level_item init'>0</div>");
+	for(var i=0; i < levelNumUpper; i++){
+		$(".graphBox .level").append("<div class='level_item level_val lever_upper'>" + levelVal*(i + 1) + "</div>");
+	}
+	for(var i=0; i < levelNumLower; i++){ 
+		$(".graphBox .level").prepend("<div class='level_item level_val lever_lower'>-" + levelVal*(i + 1) + "</div>");
+	}
+	$(".level_item").each(function(index){
+		$(this).css("left", levelW*(index) - $(this).width()/2 + "px");
+	});
+	
+	///// 그래프 bar영역 세팅
+	for(var i=0; i < barAreaNum; i++){
+		$(".graphBox .graph").append("<div class='itemArea " + $(".graph").attr("class").split(" ")[1] + (i+1) + "'></div>");
+	}
+	$(".itemArea").each(function(index){
+		for(var i=0; i < barNumInArea; i++){
+			$(this).append("<div class='bar bar" + parseInt(i+1) + "'></div>");
+		}
+		$(this).css({height: $(".graph").height()/barAreaNum + "px", width: $(".graph").width()});
+	});
+	$("<div class='line_zero'>").appendTo(".graph").css({position:"absolute", top:0, left:$(".init").position().left + 2, height:$(".graph").height(), borderLeft:"2px solid #333", zIndex:"1"});
+	
+	///// bar 높이 체크 및 표시
+	$(".itemArea").each(function(index){
+		if(typeof arrBarVal[index][0] != "undefined"){ // 데이터 arrBarVal가 2차원배열일 경우
+			for(var i=0; i < barNumInArea; i++){
+				if(typeof arrBarVal[index][i] == "undefined"){
+					$("<div style='clear:both; text-align:center;'>arrBarVal[" + index + "][" + i + "]" + " 입력된 값을 다시 확인해주세요.</div>").appendTo("body").hide().fadeIn(1000);
+				}
+				if(arrBarVal[index][i] >= 0) {
+					$(this).find(".bar").eq(i).addClass("upper").css({left: levelW*levelNumLower}).animate({width: unitGraphValW*arrBarVal[index][i] + "px"}, 1000);
+				} else if(arrBarVal[index][i] < 0) {
+					$(this).find(".bar").eq(i).addClass("lower").css({right:levelW*levelNumUpper}).animate({width: unitGraphValW*(-arrBarVal[index][i]) + "px"}, 1000);
+				}
+			}
+		} else { // 데이터 arrBarVal가 1차원배열일 경우
+			if(arrBarVal[index] >= 0) {
+				$(this).find(".bar").addClass("upper").css({bottom: levelW*levelNumLower}).animate({height: unitGraphValW*arrBarVal[index] + "px"}, 1000);
+			} else {
+				$(this).find(".bar").addClass("lower").css({top: levelW*levelNumUpper}).animate({height: unitGraphValW*(-arrBarVal[index]) + "px"}, 1000);
+			}
+		}
+	});
+
+	///// 에러체크
+	if((typeof arrBarVal[0][0] == "undefined") && (barNumInArea != 1)){
+		$("<div style='clear:both; text-align:center;'>2차원배열 데이터가 아니면 barNumInArea 입력값을 1로 세팅해 주세요.</div>").appendTo("body").hide().fadeIn(1000);
+	}
+}
+
+
+</script>
+<style>
+body, ul {padding:0; margin:0;}
+li {list-style:none;}
+.graphBox {width:800px; margin:auto; padding-top:50px; }
+.graphBox .level {position:relative; height:100%;}
+.graphBox .graph {position:relative; width:750px; height:400px; background:#fefefe;}
+.graphBox .level .level_item {position:absolute; color:#999; font-size:12px; z-index:1; text-align:center;}
+.graphBox .level .level_item:first-child {border-left:0;}
+.graphBox .graph .itemArea {position:relative; box-sizing:border-box; border-top:1px solid #eee;}
+.graphBox .graph .itemArea:first-child {border-top:0;}
+.graphBox .graph .itemArea.stick1 {border-left:0;}
+.graphBox .graph .itemArea .bar {position:absolute; bottom:0; width:0px; height:30px; background:#555;}
+.graphBox .graph .itemArea .bar.bar1 {top:5px; background:#555;}
+.graphBox .graph .itemArea .bar.bar2 {top:40px; background:#999;}
+.graphBox .graph .itemArea .bar.bar3 {top:70px; background:#ddd;}
+
+</style>
+
+</head>
+<body>
+<div class="graphBox">
+	<div class="graph stick"></div>
+	<div class="level"></div>
+</div>
+
+
+</body>
+</html>

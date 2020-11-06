@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>auto move filled input cursor to other input</title>
+<style>
+	body {padding-top:90px; text-align: center;}
+	input {width:100px; border:1px solid #ddd; padding:10px; font-size:30px; text-align: center;}
+</style>
+
+<script>
+$(document).ready(function() {
+
+	// 해당 input length입력시 다음 input/검색버튼 focus
+	$(".acptNo").each(function(i) {
+		$(this).on("keyup", function(e) {
+			var keyCode = e.keyCode ? e.keyCode : e.charCode;
+			if(!$(this).hasClass("used")) {
+				if($(this).val().length === parseInt($(this).attr("maxlength"))) {
+					$(this).addClass("used");
+					if($(this).attr("id") === "acptNo3") $(".btn_srch").focus();
+					else $(this).next().focus();
+				}
+			} else {
+				if(keyCode === 8) {
+					if($(this).prop("selectionStart") === 0) {
+						$(this).removeClass("used");
+						if(i != 0) {
+							var $prev = $(this).prev();
+							$prev.focus();
+							$prev.SelectionStart = $prev.val().length;
+						}
+					}
+				}
+			}
+		});
+	});
+
+});
+
+</script>
+</head>
+<body>
+
+	<h4>인풋 max개수 입력시 다음 input 이동</h4>
+	<input type="text" class="acptNo" maxlength="3" id="acptNo1"> - 
+	<input type="text" class="acptNo" maxlength="3" id="acptNo2"> - 
+	<input type="text" class="acptNo" maxlength="3" id="acptNo3">
+	<a href="" class="btn_srch"></a>
+
+</body>
+</html>

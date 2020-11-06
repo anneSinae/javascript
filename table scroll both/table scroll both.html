@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>테이블가로세로스크롤</title>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script>
+	
+$(document).ready(function() {
+	fixScrollBoth(".table_wrap"); // 테이블가로세로스크롤 기능 호출
+});
+
+/***** 테이블가로세로스크롤 thead, tbody first td부분 고정 *****/
+function fixScrollBoth(target) {
+	$(target).each(function(){
+		var $this = $(this);
+		var targetOther = "<div class='" + $this.attr("class").split(" ")[0] + "'><table class='" + $this.find("table").attr("class") + "' cellspacing='0' cellpadding='0'></table></div>";
+		var $theadArea, $tbodyThArea, $theadFirstTh, tbodyFirstTdW, scrollTableW;
+			  
+		$this.wrap("<div class='table_wrapBox'>").parent().width($this.width());
+		$this.find("tbody tr:first-child td").each(function(i) {
+			$(this).parents("table").find("thead th").eq(i).outerWidth($(this).outerWidth());
+			$(this).outerWidth($(this).outerWidth());
+		});
+
+		// thead영역 분리
+		$this.before(targetOther).prev().addClass("fixThead").find("table").append($this.find("thead"));
+		$theadArea = $this.parent().find(".fixThead").width($this.width());
+		$theadFirstTh = $theadArea.find("th:first-child");
+
+		// tbody th영역 분리
+		tbodyFirstTdW = $theadFirstTh.outerWidth();
+		scrollTableW = $this.find("table").width() - tbodyFirstTdW;
+		$(targetOther).insertAfter($theadArea).addClass("fixFirstTd").css({"width":scrollTableW, "height":$this.height()});
+		$this.width($this.width() - tbodyFirstTdW).css("marginLeft", tbodyFirstTdW).find("table").width(scrollTableW);
+		$this.find("tbody tr").each(function(i) {
+			$(this).find("td:first-child").height();
+			$this.parent().find(".fixFirstTd").find("table").append("<tr>").find("tr:last-child").append($(this).find("td:first-child"));
+		});
+		$tbodyThArea = $this.parent().find(".fixFirstTd");
+		$tbodyThArea.css({"width":tbodyFirstTdW}).find("table").css({"width":tbodyFirstTdW}).find("td").css({"border-right-width":0});
+
+		// fixAlways 분리
+		$("<div class='fixAlways'>").insertBefore($theadArea).css({"width": $theadFirstTh.width(), "position":"absolute", "top":0, "left":0}).text($theadFirstTh.text());
+		$theadArea.width($this.width()).find("table").width(scrollTableW);
+		$theadFirstTh.remove();
+		
+		// 스크롤시 분리영역 동시액션
+		$this.on("scroll", function(e) {
+			$theadArea.scrollLeft($(this).scrollLeft());
+			$tbodyThArea.scrollTop($(this).scrollTop());
+		});
+
+		// 분리된 영역 스크롤 가림
+		var scrollBG = "#f1f1f1", scrollSpace = 16;
+		$("<div>").addClass("hideScroll bar_y").appendTo($this.parents(".table_wrapBox")).css({"position":"absolute", "top":0, "right":0, "background":scrollBG, "width":scrollSpace, "height":$theadArea.height(), "z-index":10});
+		$("<div>").addClass("hideScroll bar_x").appendTo($this.parents(".table_wrapBox")).css({"position":"absolute", "bottom":0, "left":0, "background":scrollBG, "width":$tbodyThArea.width(), "height":scrollSpace ,"z-index":10});
+	});
+}
+</script>
+
+<style>
+/*******  테이블 스타일 table style  *******/
+.table_wrap {position:relative; clear:both;}
+.table_wrap:after {content:' '; display:block; clear:both; *zoom:1;}
+.table_wrap.scrollBoth {clear:none; width:800px; height:386px; overflow-y:scroll;}/* width, height값 변경 */
+.table_wrap.fixThead {float:right; overflow-y:scroll; overflow-x:hidden;}
+.table_wrap.fixFirstTd {position:absolute; left:0; bottom:0; overflow-y:hidden; overflow-x:scroll;}
+.table_wrap.scrollBoth table, .table_wrap.fixFirstTd table {border-top:0;}
+.table_wrapBox {position:relative; clear:both;}
+.table_wrapBox:after {content:' '; display:block; clear:both; *zoom:1;}
+.table_wrapBox .fixAlways {border-top:2px solid #315285; padding:10px 10px 10px 10px; border-left:1px solid #d4d7dc; border-bottom:1px solid #d4d7dc; background:#f0f1f3; text-align:center; font-family:'Nanum Gothic Bold'; font-size:13px; font-weight:normal; color:#293f56;} /* 기존테이블 th스타일 똑같이 적용, table border스타일있으면 추가적용 */
+
+table {width:1300px; border-top:2px solid #315285;}
+table.basic {border-spacing:0px; border-collapse:collapse; border-left:1px solid #d4d7dc;}
+table.basic tr th {padding:10px 10px 10px 10px; border-right:1px solid #d4d7dc; border-bottom:1px solid #d4d7dc; background:#f0f1f3; text-align:center; font-family:'Nanum Gothic Bold'; font-size:13px; font-weight:normal; color:#293f56;}
+table.basic tr td {padding:10px 10px 10px 10px; border-right:1px solid #d4d7dc; border-bottom:1px solid #d4d7dc; text-align:center; font-family:'Nanum Gothic'; font-size:12.5px; color:#555; line-height:160%}
+table.basic tr td input[type='text'] {width:170px; margin:-3px 0; padding:5px;}
+table.basic tr td select {margin:-3px 0;}
+table.basic tbody tr:hover {background:#f7f7f9;}
+</style>
+ </head>
+ <body>
+	<div class="table_wrap scrollBoth"><!-- scrollBoth 클래스명 추가 -->
+		<table class="basic" cellspacing="0" cellpadding="0">
+			<thead>
+				<tr>
+					<th>No</th>
+					<th>제목</th>
+					<th>내용</th>
+					<th>이름</th>
+					<th>부서</th>
+					<th>날짜</th>
+					<th>추가</th>
+					<th>조회</th>
+					<th>제목</th>
+					<th>내용</th>
+					<th>작성자</th>
+					<th>부서</th>
+					<th>날짜</th>
+					<th>비고</th>
+					<th>조회</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>10</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+				</tr>
+				<tr>
+					<td>9</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>8</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>7</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>6</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>5</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>4</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>3</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>2</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+					<tr>
+					<td>1</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					<td>제목임다</td>
+					<td>내용임다</td>
+					<td>홍길동</td>
+					<td>유신애부서</td>
+					<td>2018-06-20</td>
+					<td>추가내용</td>
+					<td>100</td>
+					</tr>
+			</tbody>
+		</table>
+	</div><!-- //table_wrap -->
+ </body>
+</html>

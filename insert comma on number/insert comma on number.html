@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Create by 유신애"/>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+  <title> insert comma on number</title>
+  <script>
+// insert comma on number : 큰 숫자에 콤마 넣기 
+function numberComma(target) {
+	$(target).each(function() {
+		var thisTxt = $(this).text();
+		var min = thisTxt[0] === "-" ? thisTxt[0] : "";
+		if(!!min) thisTxt = thisTxt.slice(1);
+		if(thisTxt.split(".")[0].length > 3) {
+			var pointAfter = thisTxt.split(".")[1], pointBefore = thisTxt.split(".")[0];
+			var arrNum = pointBefore.split("");
+			for( var j = pointBefore.length-3 ; j > 0 ; j-=3 ) {arrNum.splice(j, 0, ",");}
+			$(this).text(min + arrNum.join("") + (typeof pointAfter !== "undefined" ?  "." + pointAfter : ""));
+		}
+	});
+}
+
+$(document).ready(function() {
+	numberComma(".number");
+});
+  </script>
+ </head>
+ <body>
+<div class="number">20000000</div>
+ </body>
+</html>

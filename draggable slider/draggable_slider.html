@@ -1,0 +1,289 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<title>draggable slider</title>
+<meta name="description" content="Create by 유신애"/>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+
+<style>
+body, div, li, ul, a {margin:0; padding:0; list-style:none;}
+
+/* draggable slider */ 
+.slider_drag {position:relative; width:100%; height:500px; font-family:'Nanum Gothic';}
+.slider_drag ul {position:absolute; top:0; left:0; width:100%; height:500px; overflow:hidden;}
+.slider_drag ul li {position:relative; float:left; width:100%; height:500px; background:url(img/bear.png) no-repeat center center/150px auto;}
+.slider_drag ul li.list0 {background-color:#f0f0f0;}
+.slider_drag ul li.list1 {background-color:#e0e0e0;}
+.slider_drag ul li.list2 {background-color:#d0d0d0;}
+.slider_drag ul li.list3 {background-color:#c0c0c0;}
+.slider_drag .pager {position:absolute; top:0; left:50%; margin:450px 0 0 -47px;}
+.slider_drag .pager a {display:block; float:left; width:13px; height:13px; background:url(img/ico_slider.png) no-repeat; cursor:pointer;}
+.slider_drag .pager a.btn {background-position:0 0; margin-right:3px;}
+.slider_drag .pager a.btn.on {background-position:0 -50px;}
+.slider_drag .pager a.play {background-position:-48px 0; margin-left:5px;}
+.slider_drag .pager a.play.on {background-position:-48px -50px;}
+.slider_drag .pager a.stop {background-position:-96px 0;}
+.slider_drag .pager a.stop.on {background-position:-96px -50px;}
+.slider_drag ul li > div {position:absolute;}
+</style>
+<script type="text/javascript">
+$.fn.sliderDrag = function(option) {
+	return this.each(function() {
+		var $target = $(this),  $ul = $target.find("ul"), $li = $target.find("li");
+		var minW = option.minW, winW = $(window).width();
+		var slidingSpeed = option.slidingSpeed, duration = option.duration;
+		var currentIndex = option.startIndex != "undefined" ? option.startIndex : 0, 
+			  prevIndex, currentDirection = "right";
+		var autoSlideing;
+		
+		// create pager
+		$("<div class='pager'>").appendTo($target).append("<a class='play'>", "<a class='stop'>");
+		for(var i=0; i<$li.length; i++) $("<a class='btn'>").prependTo(".pager");
+		if(option.autoPlay === "no") $(".play, .stop").hide();
+		$(".btn").eq(currentIndex).addClass("on");
+
+		
+		// set default status
+		$target.css("min-width", minW).find("ul").wrap("<div class='slider'>").parent().css({"position":"absolute", "left":0, "height": $ul.height(), "overflow-x":"hidden"});
+		setObj();
+		$ul.prepend($li.last().clone()).append($li.first().clone());
+		checkW();
+		definePlayBtnFunction();
+
+		// set object
+		function setObj() {
+			if(typeof option.objMove != "undefined") {
+				for(var listx in option.objMove) {
+					for(var objx in option.objMove[listx]) $li.filter("." + listx).find("." + objx).css(option.objMove[listx][objx]["origin"]);
+				}
+			}
+			objMoving();
+		}
+		
+		// slide position
+		var ulDefaultPosition = parseInt($ul.css("left"));
+		function sliding(newIndex, direcion) {
+			var movePosition;
+			prevIndex = currentIndex != newIndex ? currentIndex : (direcion == "right" ? currentIndex - 1 : currentIndex + 1); 
+			currentIndex = newIndex;
+			currentDirection = direcion;
+			
+			if(direcion === "right") {
+				if(newIndex == $li.length) currentIndex = 0;
+				movePosition = -(newIndex+1) * winW;
+			}
+			if(direcion === "left") {
+				if(newIndex == -1) {
+					currentIndex = $li.length-1;
+					movePosition = ulDefaultPosition + winW;
+				} else movePosition =  -(newIndex+1) * winW;
+			}
+			$ul.animate({"left": movePosition}, {
+				duration: slidingSpeed,
+				complete : function() {
+					if(newIndex == $li.length) { $ul.css("left", -winW); }
+					if(newIndex == -1) { $ul.css("left", -($li.length) * winW); }
+				}
+			});
+			
+			$(".btn").removeClass("on");
+			$(".btn").eq(currentIndex).addClass("on");
+			objMoving();
+		}
+
+		// object moving
+		function objMoving() {
+			if(typeof option.objMove != "undefined") {
+				runMoving(currentIndex, "move");
+				runMoving(prevIndex, "origin");
+
+				function runMoving(runIndex, runType) {
+					var listObj = option.objMove["list"+runIndex];
+					for(var objx in listObj) {
+						var speed = typeof listObj[objx][runType]["speed"] != "undefined" ? listObj[objx][runType]["speed"] : 500;
+						$target.find("." + "list"+runIndex).find("." + objx).stop().animate(listObj[objx][runType], speed);
+					}
+				}
+			}
+		}
+
+		// fix full width
+		function checkW() {
+			winW = $target.outerWidth();
+			$target.find(".slider").width(winW);
+			$ul.width($ul.find("li").length * winW).find("li").width(winW);
+			$ul.css("left", -(currentIndex+1)*winW);
+		}
+		$(window).resize(function() {
+			checkW();
+		});
+		
+		// button click action
+		$(".btn").on("click", function() {
+			requestSliding("right", "selectIndex", $(this).index());
+			requestIntervalSet("stop");
+			requestIntervalSet("play");
+		});
+
+		// drag action
+		var startPosition = 0, dragDirection = "";
+		$ul.draggable({
+			scroll:false,
+			axis : 'x',
+			start : function(event, ui) { startPosition = ui.position.left; },
+			stop: function(event, ui) {
+				if(ui.position.left > startPosition) dragDirection = "left";
+				if(ui.position.left <= startPosition) dragDirection = "right";
+				
+				var distance = Math.abs(startPosition - ui.position.left);
+				if(distance > 70) {
+					requestSliding(dragDirection);
+					requestIntervalSet("stop");
+					requestIntervalSet("play");
+				}
+				else requestSliding(dragDirection, "current");
+			}
+		});
+		
+		// keyboard action
+		$(document).keyup(function(e) {
+			var keyCodeNum = e.keyCode ? e.keyCode : e.charCode;
+			if(keyCodeNum === 39) requestSliding("right");
+			if(keyCodeNum === 37) requestSliding("left");
+			requestIntervalSet("stop");
+			requestIntervalSet("play");
+		});
+
+		// mouse wheel action
+		$ul.on("mousewheel DOMMouseScroll", function(e) {
+			var currScrollT = $(document).scrollTop();
+			if(e.originalEvent.deltaY > 0) requestSliding("right");
+			if(e.originalEvent.deltaY < 0) requestSliding("left");
+			requestIntervalSet("stop");
+			requestIntervalSet("play");
+			e.preventDefault();
+			e.stopPropagation();
+		});
+		
+		// request sliding along the direction
+		function requestSliding(direction, etc, selectIndex) {
+			if(typeof etc === "undefined") {
+				switch(direction) {
+					case "right" : sliding(currentIndex+1, "right"); break;
+					case "left" : sliding(currentIndex-1, "left"); break;
+				}
+			} else if(etc === "current") {
+				switch(direction) {
+					case "right" : sliding(currentIndex, "right"); break;
+					case "left" : sliding(currentIndex, "left"); break;
+				}
+			} else if(etc === "selectIndex") sliding(selectIndex, direction);
+		}
+
+		// auto play
+		function definePlayBtnFunction() {
+			requestIntervalSet("play");
+			$target.find(".play").addClass("on");
+
+			$target.find(".play").on("click", function() {
+				if(!$(this).hasClass("on")) {
+					$(this).addClass("on").parent().find(".stop").removeClass("on");
+					requestIntervalSet("play");
+				}
+			});
+			$target.find(".stop").on("click", function() {
+				if(!$(this).hasClass("on")) {
+					$(this).addClass("on").parent().find(".play").removeClass("on");
+					requestIntervalSet("stop");
+				}
+			});
+		}
+
+		// request interval set
+		function requestIntervalSet(status) {
+			if(option.autoPlay === "yes") {
+				switch(status) {
+					case "play" : autoSlideing = setInterval(startSliding, option.duration); break;
+					case "stop" : clearInterval(autoSlideing); break;
+				}
+				function startSliding() { requestSliding(currentDirection); }
+			}
+		}
+
+	});
+}
+
+
+$(document).ready(function() {
+	$(".slider_drag").sliderDrag({
+		minW : 980,
+		slidingSpeed : 500,
+		duration : 7000,
+		autoPlay : "yes",
+		startIndex : 0,
+		objMove : {
+			list0 : {
+				obj1: { origin : {"left":220, "top":0, "width":100, "height":100, "background-color":"white", "width":100}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:2000} },
+				obj2: { origin : {"left":10, "top":150, "width":100, "height":100, "background-color":"black"}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:3000} },
+				obj3: { origin : {"left":300, "top":200, "width":100, "height":100, "background-color":"gray", speed:1000}, move : {"left":50, "top":0, "background-color":"white", "width":50, speed:4000} }
+			},
+			list1 : {
+				obj1: { origin : {"left":220, "top":0, "width":100, "height":100, "background-color":"white"}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:500} },
+				obj2: { origin : {"left":10, "top":100, "width":100, "height":100, "background-color":"blue"}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:700} },
+				obj3: { origin : {"left":300, "top":400, "width":100, "height":100, "background-color":"gray", speed:1000}, move : {"left":50, "top":0, "background-color":"white", "width":50, speed:2000} }
+			},
+			list2 : {
+				obj1: { origin : {"left":220, "top":0, "width":100, "height":100, "background-color":"white", speed:100}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:2000} },
+				obj2: { origin : {"left":10, "top":100, "width":100, "height":100, "background-color":"red", speed:1000}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:700} },
+				obj3: { origin : {"left":300, "top":200, "width":100, "height":100, "background-color":"gray", speed:1000}, move : {"left":50, "top":0, "background-color":"white", "width":50, speed:2000} }
+			},
+			list3 : {
+				obj1: { origin : {"left":220, "top":0, "width":100, "height":100, "background-color":"white", speed:100}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:2000} },
+				obj2: { origin : {"left":10, "top":100, "width":100, "height":100, "background-color":"yellow", speed:1000}, move : {"left":50, "top":0, "background-color":"white", "width":200, speed:700} },
+				obj3: { origin : {"left":300, "top":200, "width":100, "height":100, "background-color":"gray", speed:1000}, move : {"left":50, "top":0, "background-color":"white", "width":50, speed:2000} }
+			},
+		}
+	});
+
+});
+
+</script>
+</head>
+<body>
+
+
+<div class="slider_drag">
+	<ul>
+		<li class="list0">1
+			<div class="obj1"></div>
+			<div class="obj2"></div>
+			<div class="obj3"></div>
+		</li>
+		<li class="list1">2
+			<div class="obj1"></div>
+			<div class="obj2"></div>
+			<div class="obj3"></div>
+		</li>
+		<li class="list2">3
+			<div class="obj1"></div>
+			<div class="obj2"></div>
+			<div class="obj3"></div>
+		</li>
+		<li class="list3">4
+			<div class="obj1"></div>
+			<div class="obj2"></div>
+			<div class="obj3"></div>
+		</li>
+	</ul>
+</div>
+<div class="" style="max-width:1190px; height:500px; margin:40px auto; padding:0 20px; color:#333;">
+	<h2>LORD OF THE RINGS: THE FELLOWSHIP OF THE RINGS</h2>
+	The world is changed. I feel it in the water. I feel it in the earth. I smell it in the air. Much that once was is lost, for none now live who remember it. It began with the forging of the Rings of Power. Three were given to the Elves, immortal,
+	wisest and fairest of all beings. Seven were given to the Dwarves, great miners and craftsmen of the mountain halls. And nine, nine rings were gifted to the race of Men, who above all else desire power. For within these rings was bound the power and the will to rule each race. But they were all of them deceived, for deep in the land of Mordor, the Dark Lord Sauron forged another ring, a master ring, and into this ring he poured all his cruelty, his malice and his will to dominate every living thing. One ring to rule them all. One by one, the free peoples of Middle Earth fell to the power of the Ring, but there were some who resisted. A last alliance of men and elves marched against the armies of Mordor, and on the very slopes of Mount Doom, they fought for the freedom of Middle-Earth. Victory was near, but the power of the ring could not be undone. SAURON appears, crushing a dozen MEN with each blow of his huge mace.
+</div>
+</body>
+</html>
