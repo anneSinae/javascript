@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>timeout for logout</title>
+<style>
+</style>
+
+<script>
+  let logoutTimer = function() {
+    let timerOpt = {
+      limitTime : 1000*600,
+      funcTimeout : '',
+      funcAfterLimit : function() {},
+      funcStartTimer : function() {
+        timerOpt.funcTimeout = window.setTimeout(timerOpt.funcAfterLimit, timerOpt.limitTime);
+      },
+      funcResetTimer : function() {
+        window.clearTimeout(timerOpt.funcTimeout);
+        timerOpt.funcStartTimer();
+      }
+    }
+
+    document.onmousemove = function() {
+      timerOpt.funcResetTimer();
+    }
+
+    document.onkeypress = function() {
+      timerOpt.funcResetTimer();
+    }
+
+    return timerOpt;
+  }();
+
+  $(document).ready(function() {
+    logoutTimer.funcAfterLimit = function() {
+      $(".btn_logout").click();
+      alert("장시간 움직임이 없어 로그아웃 되었습니다.");
+    }
+    logoutTimer.funcStartTimer();
+  });
+</script>
+</head>
+<body>
+  <button type="button" class="btn_logout">로그아웃</button>
+</body>
+</html>

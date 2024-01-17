@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>indexedDB</title>
+<style>
+</style>
+</head>
+<body>
+<ul></ul>
+
+<script>
+  const note = document.querySelector("ul");
+  // Let us open version 4 of our database
+  const DBOpenRequest = window.indexedDB.open("AnneDB", 4);
+  
+  // these two event handlers act on the database being opened
+  // successfully, or not
+  DBOpenRequest.onerror = (event) => {
+    note.innerHTML += '<li>Error loading database.</li>';
+  };
+  
+  DBOpenRequest.onsuccess = (event) => {
+    note.innerHTML += '<li>Database initialized.</li>';
+  
+    // store the result of opening the database in the db
+    // variable. This is used a lot later on, for opening
+    // transactions and suchlike.
+    db = DBOpenRequest.result;
+  };
+  </script>
+</body>
+</html>

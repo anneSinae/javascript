@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>get geolocation info</title>
+<style>
+</style>
+</head>
+<body>
+<div class="info">
+  <p>timestamp : <span class="timestamp"></span></p>
+  <p>coords : <span class="coords"></span></p>
+</div>
+
+<script>
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, onError);
+    //navigator.geolocation.watchPosition(showPosition);
+  } else {
+    onError();
+  }
+
+function onError() {
+  console.log("error");
+} 
+
+  function showPosition(position) {
+    console.log(position, "position");
+    $(".info .timestamp").text(new Date(position.timestamp));
+    $(".info .coords").text("latitude=" + position.coords.latitude + " / longitude=" + position.coords.longitude);
+  }
+
+</script>
+</body>
+</html>

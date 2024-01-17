@@ -1,0 +1,75 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<title>Guage circle</title>
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="excanvas.js"></script>
+<style>
+body {display:flex; justify-content:center; padding-top:50px;}
+
+/* Guage circle */
+.guage_circle {position:relative; width:300px; height:300px; background:#f8f8f8;}
+.guage_circle .guageTxt {position:absolute; top:0; left:0; z-index:3; display:flex; justify-content:center; align-items:center; width:100%; height:100%; font-size:30px; color:#ddd; text-indent:7px; font-family:"malgun gothic"; letter-spacing: -5px;;}
+.guage_circle .guageTxt * {vertical-align:middle; font-style:normal;}
+.guage_circle .guageTxt .current {text-align:center; color:#2981d3;}
+.guage_circle .guageTxt .total {color:#444;}
+.guage_circle .guageTxt .unit {color:#444; font-size:22px;}
+.guage_circle .guageFrame, .guage_circle .guageAmount {position:absolute; top:0; left:0; width:100%; height:100%;}
+.guage_circle .guageFrame {z-index:2; background:url('guage_circle_frame.png') no-repeat center center; background-size:100% 100%;}
+.guage_circle .guageAmount {z-index:1;}
+
+</style>
+<script>
+$(document).ready(function() {
+	guageCircle({guageWrap:"#guage_week", target:".guageAmount", guageColor:"#5aa8f0", diameter:200});
+	guageCircle({guageWrap:"#guage_week2", target:".guageAmount", guageColor:"gray", diameter:200});
+});
+
+function guageCircle(option) {
+	var $target = $(option.guageWrap).find(option.target).get(0);
+	var total =  $(option.guageWrap).find(".total").text();
+	var current =  $(option.guageWrap).find(".current").text();
+	var amount = current*2/total, point = 0; 
+	var locate_radius = option.diameter/2;
+	$target.width = option.diameter;
+	$target.height = option.diameter;
+
+	var increase = setInterval(increaseAmount, 2);
+	function increaseAmount() {
+		if(point <= amount) {
+			if($target.getContext) {
+				point += 0.01;
+				if(point > 2) point;
+				var ctx = $target.getContext("2d");
+				ctx.beginPath();
+				ctx.arc(locate_radius, locate_radius, locate_radius, Math.PI*1.5, Math.PI*(1.5+point), false);
+				//ctx.lineTo(locate_radius, locate_radius);
+				ctx.strokeStyle = option.guageColor;
+				ctx.stroke();
+			}
+		} else { 
+			clearInterval(increase);
+		}
+	}
+}
+</script>
+</head>
+<body>
+
+<div id="guage_week" class="guage_circle">
+	<div class="guageTxt"><b class="current">1</b><i>/</i><b class="total">7</b><i class="unit">개</i></div>
+	<div class="guageFrame"></div>
+	<canvas class="guageAmount"></canvas>
+</div>
+
+<div id="guage_week2" class="guage_circle">
+	<div class="guageTxt"><b class="current">5</b><i>/</i><b class="total">10</b><i class="unit">개</i></div>
+	<div class="guageFrame"></div>
+	<canvas class="guageAmount"></canvas>
+</div>
+
+</body>
+</html>

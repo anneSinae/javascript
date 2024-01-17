@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>scroll animation</title>
+<style>
+  * {margin: 0; padding: 0;}
+.box {
+  width: 30rem;
+  height: 30rem;
+  margin: 5rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  background-color: #febf00;
+  transition: .4s;
+}
+.box.active {
+  transform: scaleX(1.5);
+  background: #f03d3d;
+  color: #fff;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  const boxList = document.querySelectorAll('.box');
+
+  const options = {
+    root: null, // viewport
+    rootMargin: "0px",
+    threshold: 1.0,  // 50%가 viewport에 들어와 있어야 callback 실행
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      } else {
+        entry.target.classList.remove('active');
+      }
+      console.log(entry.target, "target //////////////////////");
+      // console.log(entry.boundingClientRect, "boundingClientRect");
+      // console.log(entry.intersectionRatio, "intersectionRatio");
+      // console.log(entry.intersectionRect, "intersectionRect");
+      // console.log(entry.isIntersecting, "isIntersecting");
+      // console.log(entry.time, "time");
+    });
+  }, options);
+
+  boxList.forEach(el => {
+    observer.observe(el);
+    console.log(el);
+  });
+});
+</script>
+</head>
+<body>
+<div calss="wrap">
+  <div class="box">1</div>
+  <div class="box">2</div>
+  <div class="box">3</div>
+  <div class="box">4</div>
+  <div class="box">5</div>
+  <div class="box">6</div>
+  <div class="box">7</div>
+  <div class="box">8</div>
+  <div class="box">9</div>
+  <div class="box">10</div>
+</div>
+</body>
+</html>
