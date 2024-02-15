@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://unpkg.com/hangul-js"></script>
+<!--<script src="https://unpkg.com/type-hangul@latest/dist/type-hangul.min.js"></script>-->
+<script src="js/type-hangul.js"></script>
+<title>animation_typingKorean</title>
+<style>
+
+  @font-face {
+    font-family: 'adobaonlyR';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/adobaonlyR.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  * {box-sizing: border-box; font-family: 'adobaonlyR'; font-size: 30px;}
+
+  #target { 
+  color:#333;
+  text-align: center;
+  font-weight: bold;
+  font-size: 50px;
+  margin-top: 150px;
+  }
+  #target::after {
+    content: "|";
+    color:orange;
+    animation: caret .8s infinite;
+  }
+
+  @keyframes caret {
+    50% {
+      opacity:0;
+    }
+  }
+</style>
+
+<script>
+$(document).ready(function() {
+
+  TypeHangul.type('#target', {
+    intervalType: 300 //typing speed
+  });
+
+  TypeHangul.type('#target2', {
+    intervalType: 100 //typing speed
+  });
+
+});
+</script>
+</head>
+<body>
+  <div id="target">유신애</div>
+  <div id="target2">사람과 사람이 만나 함께하다.</div>
+</body>
+</html>
