@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>scroll animation</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 300px;
+  margin: 0 auto;
+  padding: 10px 0;
+  box-shadow: 0px 0px 30px 5px rgba(0, 0, 0, 0.2);
+}
+
+.box {
+  width: 60%;
+  height: 90vh;
+  margin: 5vh auto;
+  border-radius: 5px;
+  background: whiteSmoke;
+  box-shadow: 4px -20px 40px 5px rgb(26, 117, 206) inset;
+}
+
+.shake {
+  animation: shake .5s ease;
+}
+
+@keyframes shake {
+  30% { transform: scale(1.1); }
+  40%, 60% { transform: rotate(-10deg) scale(1.1); }
+  50% { transform: rotate(10deg) scale(1.1); }
+  70% { transform: rotate(0deg) scale(1.2); }
+  100% { transform: scale(1); }
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  const boxes = document.querySelectorAll('.box');
+
+const callback = (entries, observer) => {
+  entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('shake');  
+      } else {
+        entry.target.classList.remove('shake');  
+      }
+  })
+}
+
+const observer = new IntersectionObserver(callback, {
+  theshold: 0.2,
+});
+
+boxes.forEach(box => observer.observe(box))
+});
+</script>
+</head>
+<body>
+  <div class=container>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+  </div>
+</body>
+</html>

@@ -32,15 +32,17 @@ $(document).ready(function() {
   const options = {
     root: null, // viewport
     rootMargin: "0px",
-    threshold: 1.0,  // 50%가 viewport에 들어와 있어야 callback 실행
+    threshold: 0.6,  // viewport에 설정비율만큼 들어와 있어야 callback 실행
   }
 
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('active');
+        console.log("111")
       } else {
         entry.target.classList.remove('active');
+        console.log("222")
       }
       console.log(entry.target, "target //////////////////////");
       // console.log(entry.boundingClientRect, "boundingClientRect");
@@ -52,6 +54,7 @@ $(document).ready(function() {
   }, options);
 
   boxList.forEach(el => {
+    console.log("test");
     observer.observe(el);
     console.log(el);
   });
