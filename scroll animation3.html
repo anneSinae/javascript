@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Create by 유신애"/>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<title>scroll animation</title>
+<style>
+  * {margin: 0; padding: 0;}
+  .container {
+    width: 600px;
+    margin: 0 auto;
+    margin-bottom: 100px;
+  }
+
+  .scroll {font-size: 40px; text-align: center;  height: 100vh;  line-height: 100vh;
+    animation: bounce 2s ease infinite;}
+
+  @keyframes bounce {
+      70% { transform:translateY(0%); }
+      80% { transform:translateY(-15%); }
+      90% { transform:translateY(0%); }
+      95% { transform:translateY(-7%); }
+      97% { transform:translateY(0%); }
+      99% { transform:translateY(-3%); }
+      100% { transform:translateY(0); }
+  }
+img {width: 100%; height: 2500px; }
+  .opacity-image {opacity: 0;}
+</style>
+
+<script>
+$(document).ready(function() {
+  const opacityImage = document.querySelector('.opacity-image');
+
+  const callback = ([entry], observer) => {
+      entry.target.style.opacity = entry.intersectionRatio*2.9;
+  }
+
+  const observer = new IntersectionObserver(callback, {
+    threshold: [...new Array(101)].map((item_, i) => i / 100)
+  });
+
+  observer.observe(opacityImage);
+});
+</script>
+</head>
+<body>
+  <div class="container">
+    <div class="scroll">👇</div>
+   <img src="0_img/img.jpg"
+    class="opacity-image">
+    <img src="0_img/img.jpg">
+ </div>
+</body>
+</html>
